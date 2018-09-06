@@ -6,28 +6,72 @@
 </head>
 
 <body>
-  <div class="container">
-    <div class="header">
-      <h3 class="text-muted">Third Hexlet Project</h3>
+  <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+    <a class="navbar-brand" href="#">RSS Reader</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse"
+      aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Link</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link disabled" href="#">Disabled</a>
+        </li>
+      </ul>
     </div>
+  </nav>
 
+  <div class="container">
     <div class="jumbotron">
-      <h1>RSS Reader</h1>
-      <p class="lead">Discover the best sources for any topic.</p>
-      <form class="form-inline">
-        <div class="form-group mb-2">
-          <input class="form-control form-control-lg" type="text" placeholder="Enter RSS feed link">
-        </div>
-        <div class="form-group mx-sm-3 mb-2">
-          <button type="submit" class="btn btn-lg btn-success">ADD CONTENT</button>
+      <h1 class="display-3">Third hexlet project</h1>
+      <p class="lead">Discover the best sources for any topic</p>
+
+      <form class="needs-validation" id="addFeedForm" novalidate>
+        <div class="form-row">
+          <div class="col-md-9 mb-3">
+            <input type="text" class="form-control form-control-lg" id="linkInput" placeholder="Enter RSS link" required>
+          </div>
+          <div class="col-md-3 mb-3">
+            <button class="btn btn-primary btn-lg btn-success" id="addFeedButton" type="submit">ADD CONTENT</button>
+          </div>
         </div>
       </form>
     </div>
 
+    <div class="row marketing">
+      <div class="col-lg-3">
+        <h3>RSS Feeds
+        </h3>
+
+        <div id="feeds-list">
+
+        </div>
+        <!-- end feeds list -->
+      </div>
+
+      <div class="col-lg-9">
+        <h3>Topics
+        </h3>
+        <div id="articles">
+
+        </div>
+        <!-- end topics list -->
+      </div>
+    </div>
+
     <footer class="footer">
-      <p>© Cherepanov 2018</p>
+      <p>&copy; Cherepanov 2018</p>
     </footer>
   </div>
+
+
+
 </body>
 
 </html>
