@@ -6,6 +6,21 @@
 </head>
 
 <body>
+  <!-- Modal -->
+  <div class="modal fade" id="articleDescriptionModal" tabindex="-1" role="dialog" aria-labelledby="articleDescriptionModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-body">
+         Test
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
     <a class="navbar-brand" href="#">RSS Reader</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse"
@@ -35,7 +50,8 @@
       <form class="needs-validation" id="addFeedForm" novalidate>
         <div class="form-row">
           <div class="col-md-9 mb-3">
-            <input type="text" class="form-control form-control-lg" id="linkInput" placeholder="Enter RSS link" required>
+            <input type="text" class="form-control form-control-lg" id="linkInput" placeholder="Enter RSS link"
+              required>
           </div>
           <div class="col-md-3 mb-3">
             <button class="btn btn-primary btn-lg btn-success" id="addFeedButton" type="submit">ADD CONTENT</button>

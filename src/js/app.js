@@ -14,7 +14,11 @@ import {
 } from './render';
 
 import {
-  state, stateConstants, changeInput, addFeed, getArticles,
+  state,
+  stateConstants,
+  changeInput,
+  addFeed,
+  getArticles,
 } from './state';
 
 const onModelFormStateChanged = (_prop, _action, newState) => {
