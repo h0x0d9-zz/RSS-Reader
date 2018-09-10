@@ -80,11 +80,8 @@ export default () => {
   );
 
   const addArticles = (articles) => {
-    const storedLinks = state.articlesList
-      .map(({ link }) => link)
-      .filter((link, pos, array) => array.indexOf(link) === pos);
-    const uniqueAdding = articles
-      .filter(({ link }) => storedLinks.indexOf(link) === -1);
+    const storedSet = new Set(state.articlesList.map(({ link }) => link));
+    const uniqueAdding = articles.filter(({ link }) => !storedSet.has(link));
 
     if (uniqueAdding.length !== 0) {
       state.articlesList.push(...uniqueAdding);
