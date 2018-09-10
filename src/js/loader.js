@@ -1,5 +1,5 @@
 import axios from 'axios';
-import parse from './rssparser';
+import parse from './rssParser';
 
 const proxyURL = 'https://cors-anywhere.herokuapp.com/';
 

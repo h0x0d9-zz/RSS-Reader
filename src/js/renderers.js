@@ -91,8 +91,13 @@ export const renderDuplicateErrorInput = () => renderValidity(false, 'You are al
 
 export const renderLinkIsValid = () => renderValidity(true, '');
 
-export const renderSubmitError = (error) => {
-  renderValidity(false, error.toString());
+export const renderError = (error) => {
+  if (error === null) {
+    renderValidity(true, '');
+  } else {
+    renderValidity(false, error.toString());
+  }
+
   getFeedUrlSubmitButton().removeAttribute('disabled');
   getFeedUrlInputElement().removeAttribute('disabled');
 };

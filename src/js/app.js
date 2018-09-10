@@ -1,5 +1,7 @@
 import { watch } from 'melanke-watchjs';
 
+import fetchFeed from './loader';
+
 import {
   getFeedUrlInputElement,
   getNewFeedForm,
@@ -10,70 +12,131 @@ import {
   renderNotValidInput,
   renderDuplicateErrorInput,
   renderLinkIsValid,
-  renderSubmitError,
-} from './render';
+  renderError,
+} from './renderers';
 
 import {
-  state,
   stateConstants,
-  changeInput,
-  addFeed,
-  getArticles,
-} from './state';
+  updateInputState,
+} from './stateUtils';
 
-const onModelFormStateChanged = (_prop, _action, newState) => {
-  switch (newState) {
-    case stateConstants.linkNotValid:
-      renderNotValidInput();
-      break;
-    case stateConstants.duplicateError:
-      renderDuplicateErrorInput();
-      break;
-    case stateConstants.waiting:
-      renderWaiting();
-      break;
-    case stateConstants.linkIsValid:
-      renderLinkIsValid();
-      break;
-    case stateConstants.clean:
-      renderClean();
-      break;
-    case stateConstants.error:
-      renderSubmitError(state.error);
-      break;
-    default:
-      throw new Error(`Transition to an unexpected state: ${newState}`);
-  }
-};
 
-const onModelArticlesUpdated = () => {
-  const articles = getArticles();
-  articles.forEach(article => renderNewArticle(article));
-};
-
-const onModelFeedAdded = (_prop, _action, newFeed) => {
-  renderNewFeed(newFeed);
-};
-
-const setupWatchers = () => {
-  watch(state, 'formState', onModelFormStateChanged);
-  watch(state, 'feedsList', onModelFeedAdded);
-  watch(state, 'articlesList', onModelArticlesUpdated);
-};
-
-const feedUrlInputHandler = ({ target }) => changeInput(target.value);
-
-const feedUrlSubmitHandler = (ev) => {
-  ev.preventDefault();
-  addFeed(state.newFeedUrl);
-};
-
-const setupHandlers = () => {
-  getFeedUrlInputElement().addEventListener('input', feedUrlInputHandler);
-  getNewFeedForm().addEventListener('submit', feedUrlSubmitHandler);
-};
+const timerDelay = 5000;
 
 export default () => {
-  setupWatchers();
-  setupHandlers();
+  const state = {
+    formState: stateConstants.clean,
+    newFeedUrl: '',
+    feedsList: [],
+    articlesList: [],
+    currentError: null,
+  };
+
+  const onFormStateChanged = (_prop, _action, newState) => {
+    switch (newState) {
+      case stateConstants.linkNotValid:
+        renderNotValidInput();
+        break;
+      case stateConstants.duplicateError:
+        renderDuplicateErrorInput();
+        break;
+      case stateConstants.waiting:
+        renderWaiting();
+        break;
+      case stateConstants.linkIsValid:
+        renderLinkIsValid();
+        break;
+      case stateConstants.clean:
+        renderClean();
+        break;
+      default:
+        throw new Error(`Transition to an unexpected state: ${newState}`);
+    }
+  };
+
+  const onStateArticlesUpdated = (_prop, _action, val) => {
+    const startIndex = state.articlesList.indexOf(val);
+    const articles = state.articlesList.slice(startIndex);
+    articles.forEach(article => renderNewArticle(article));
+  };
+
+  const onStateFeedAdded = (_prop, _action, newFeed) => {
+    renderNewFeed(newFeed);
+  };
+
+  const onModelCaughtError = (_prop, _action, err) => {
+    renderError(err);
+  };
+
+  const setupWatchers = () => {
+    watch(state, 'formState', onFormStateChanged);
+    watch(state, 'feedsList', onStateFeedAdded);
+    watch(state, 'articlesList', onStateArticlesUpdated);
+    watch(state, 'currentError', onModelCaughtError);
+  };
+
+  const inputHandler = ({ target }) => Object.assign(
+    state, updateInputState(target.value, state),
+  );
+
+  const addArticles = (articles) => {
+    const storedLinks = state.articlesList
+      .map(({ link }) => link)
+      .filter((link, pos, array) => array.indexOf(link) === pos);
+    const uniqueAdding = articles
+      .filter(({ link }) => storedLinks.indexOf(link) === -1);
+
+    if (uniqueAdding.length !== 0) {
+      state.articlesList.push(...uniqueAdding);
+    }
+  };
+
+  const submitHandler = (ev) => {
+    ev.preventDefault();
+    if (state.formState !== stateConstants.linkIsValid) {
+      return;
+    }
+
+    state.formState = stateConstants.waiting;
+
+    fetchFeed(state.newFeedUrl)
+      .then(feed => ({ ...feed, link: state.newFeedUrl }))
+      .then((feed) => {
+        state.formState = stateConstants.clean;
+        state.newFeed = '';
+        state.feedsList.push(feed);
+        addArticles(feed.articles);
+      })
+      .catch((error) => {
+        state.currentError = new Error(error);
+      });
+  };
+
+  const setupHandlers = () => {
+    getFeedUrlInputElement().addEventListener('input', inputHandler);
+    getNewFeedForm().addEventListener('submit', submitHandler);
+  };
+
+  const runUpdate = () => {
+    const feedsLinks = state.feedsList.map(({ link }) => link);
+    if (feedsLinks.length === 0) {
+      setTimeout(runUpdate, timerDelay);
+      return;
+    }
+
+    Promise.all(feedsLinks.map(fetchFeed))
+      .then(feeds => feeds.forEach(feed => addArticles(feed.articles)))
+      .then(() => setTimeout(runUpdate, timerDelay))
+      .catch(() => {
+        setTimeout(runUpdate, timerDelay);
+      });
+  };
+
+  const init = () => {
+    setupWatchers();
+    setupHandlers();
+    runUpdate();
+  };
+
+  init();
 };
