@@ -123,10 +123,10 @@ export default () => {
 
     Promise.all(feedsLinks.map(fetchFeed))
       .then(feeds => feeds.forEach(feed => addArticles(feed.articles)))
-      .then(() => setTimeout(runUpdate, timerDelay))
-      .catch(() => {
-        setTimeout(runUpdate, timerDelay);
-      });
+      .catch((err) => {
+        console.warn(err);
+      })
+      .finally(() => setTimeout(runUpdate, timerDelay));
   };
 
   const init = () => {
