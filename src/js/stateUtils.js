@@ -30,5 +30,3 @@ export const updateInputState = (inputValue, oldState) => {
 
   return newState;
 };
-
-export const getArticlesFromState = state => state.articlesList;
